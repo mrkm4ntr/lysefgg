@@ -18,8 +18,11 @@ loop(S = #state{server=Server, to_go=[T|Next]}) ->
 start(EventName, Delay) ->
   spawn(?MODULE, init, [self(), EventName, Delay]).
 
-init(Server, EventName, Delay) ->
-  loop(#state{server=Server, name=EventName, to_go=normalize(Delay)}).
+start_link(EventName, Delay) ->
+  spawn_link(?MODULE, init, [self(), EventName, Delay]).
+
+init(Server, EventName, DateTime) ->
+  loop(#state{server=Server, name=EventName, to_go=time_to_go(DateTime)}).
 
 cancel(Pid) ->
   Ref = erlang:monitor(process, Pid),
