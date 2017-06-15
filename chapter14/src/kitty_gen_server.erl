@@ -29,23 +29,21 @@ handle_call({order, Name, Color, Description}, _From, Cats) ->
        {reply, hd(Cats), tl(Cats)}
   end;
 
-handle_call(shutdown, _From, Cats) ->
-  {reply, ok, Cats}.
+handle_call(terminate, _From, Cats) ->
+  {stop, nomal, ok, Cats}.
 
 handle_cast({return, Cat}, Cats) ->
   {noreply, [Cat | Cats]}.
 
-terminate(shutdown, Cats) ->
+terminate(normal, Cats) ->
   [io:format("~p was set free.~n", [C#cat.name]) || C <- Cats],
-  ok;
-
-terminate(normal, _Cats) ->
   ok.
 
 code_change(_OldVsn, State, _Extra) ->
   {ok, State}.
 
-handle_info(_Msg, Cats) ->
+handle_info(Msg, Cats) ->
+  io:format("Unexpredted message: ~p~n", Msg),
   {noreply, Cats}.
 
 make_cat(Name, Color, Description) ->
