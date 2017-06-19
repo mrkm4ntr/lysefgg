@@ -1,9 +1,11 @@
 -module(curling).
--export([start_link/2, set_teams/2, add_points/2, next_round/0, join_feed/1, leave_feed/1]).
+-export([start_link/2, set_teams/2, add_points/2, next_round/0,
+  join_feed/1, leave_feed/1, game_info/0]).
 
 start_link(TeamA, TeamB) ->
   {ok, Pid} = gen_event:start_link({local, ?MODULE}),
   gen_event:add_handler(Pid, curling_scoreboard, []),
+  gen_event:add_handler(Pid, curling_accumulator, []),
   set_teams(TeamA, TeamB),
   ok.
 
@@ -23,3 +25,6 @@ join_feed(Pid) ->
 
 leave_feed(HandlerId) ->
   gen_event:delete_handler(?MODULE, HandlerId, leave_feed).
+
+game_info() ->
+  gen_event:call(?MODULE, curling_accumulator, game_data).
